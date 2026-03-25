@@ -144,10 +144,8 @@ class GeminiLiveAPI {
     this.responseModalities = ["AUDIO"];
     this.systemInstructions = "";
     this.googleGrounding = false;
-    this.enableAffectiveDialog = false; // Default affective dialog
     this.voiceName = "Puck"; // Default voice
     this.temperature = 1.0; // Default temperature
-    this.proactivity = { proactiveAudio: false }; // Proactivity config
     this.inputAudioTranscription = false;
     this.outputAudioTranscription = false;
     this.enableFunctionCalls = false;
@@ -218,10 +216,7 @@ class GeminiLiveAPI {
     this.voiceName = voiceName;
   }
 
-  setProactivity(proactivity) {
-    console.log("setting proactivity: ", proactivity);
-    this.proactivity = proactivity;
-  }
+
 
   setInputAudioTranscription(enabled) {
     console.log("setting input audio transcription: ", enabled);
@@ -346,19 +341,19 @@ class GeminiLiveAPI {
         },
         systemInstruction: { parts: [{ text: this.systemInstructions }] },
         tools: [{ functionDeclarations: tools }],
-        turnCoverage: "TURN_INCLUDES_ONLY_ACTIVITY",
-        // proactivity: this.proactivity,
 
-        // realtimeInputConfig: {
-        //   automaticActivityDetection: {
-        //     disabled: this.automaticActivityDetection.disabled,
-        //     silenceDurationMs: this.automaticActivityDetection.silence_duration_ms,
-        //     prefixPaddingMs: this.automaticActivityDetection.prefix_padding_ms,
-        //     endOfSpeechSensitivity: this.automaticActivityDetection.end_of_speech_sensitivity,
-        //     startOfSpeechSensitivity: this.automaticActivityDetection.start_of_speech_sensitivity,
-        //   },
-        //   activityHandling: this.activityHandling,
-        // },
+
+        realtimeInputConfig: {
+          automaticActivityDetection: {
+            disabled: this.automaticActivityDetection.disabled,
+            silenceDurationMs: this.automaticActivityDetection.silence_duration_ms,
+            prefixPaddingMs: this.automaticActivityDetection.prefix_padding_ms,
+            endOfSpeechSensitivity: this.automaticActivityDetection.end_of_speech_sensitivity,
+            startOfSpeechSensitivity: this.automaticActivityDetection.start_of_speech_sensitivity,
+          },
+          activityHandling: this.activityHandling,
+          turnCoverage: "TURN_INCLUDES_ONLY_ACTIVITY",
+        },
       },
     };
 
@@ -378,10 +373,7 @@ class GeminiLiveAPI {
       sessionSetupMessage.setup.tools = [{ googleSearch: {} }];
     }
 
-    // Add affective dialog if enabled
-    // if (this.enableAffectiveDialog) {
-    //   sessionSetupMessage.setup.generationConfig.enableAffectiveDialog = true;
-    // }
+
 
     // Store the setup message for later access
     this.lastSetupMessage = sessionSetupMessage;
