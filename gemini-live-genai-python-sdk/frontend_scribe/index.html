@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clinical Scribe - Live Transcription</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Clinical Scribe</h1>
+        <div style="display: flex; gap: 10px; align-items: center">
+          <div id="status" class="status disconnected">Disconnected</div>
+        </div>
+      </header>
+
+      <main>
+        <!-- Connect Section -->
+        <div class="auth-section" id="auth-section">
+          <div class="description-box" style="margin-bottom: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px; text-align: left;">
+            <h3>How it works:</h3>
+            <ul style="margin: 10px 0 20px 20px">
+              <li><strong>Step 1:</strong> Click Connect, then Start Mic to begin recording.</li>
+              <li><strong>Step 2:</strong> Speak naturally — your words appear as live transcript.</li>
+              <li><strong>Step 3:</strong> When done, click <em>End &amp; Analyze</em> to generate structured clinical notes.</li>
+            </ul>
+            <p><em>The AI does NOT talk back. It only transcribes your speech in real-time.</em></p>
+          </div>
+          <p>Click below to connect.</p>
+          <button id="connectBtn" class="btn">Connect</button>
+        </div>
+
+        <!-- Session End Section -->
+        <div class="session-end-section hidden" id="session-end-section">
+          <h2>Session Ended</h2>
+          <button id="restartBtn" class="btn">Start New Session</button>
+        </div>
+
+        <!-- Main App Section -->
+        <div class="app-section hidden" id="app-section">
+          <div class="app-grid">
+            <div class="left-panel">
+              <div class="controls">
+                <button id="micBtn" class="btn icon-btn">Start Mic</button>
+                <button id="analyzeBtn" class="btn icon-btn" style="background: #2e7d32; color: white;">End &amp; Analyze</button>
+                <button id="disconnectBtn" class="btn icon-btn danger">Disconnect</button>
+              </div>
+            </div>
+
+            <div class="right-panel">
+              <div class="chat-log" id="chat-log">
+                <div class="message system" style="color: #888; font-style: italic;">
+                  Waiting for audio... Start the mic and begin speaking.
+                </div>
+              </div>
+              
+              <!-- Analysis Result Panel (hidden until analysis) -->
+              <div id="analysis-panel" class="hidden" style="margin-top: 10px; padding: 15px; background: #f0f7f0; border-radius: 8px; border: 1px solid #c8e6c9;">
+                <h3 style="margin: 0 0 10px 0;">Clinical Analysis</h3>
+                <pre id="analysis-result" style="white-space: pre-wrap; font-size: 14px; margin: 0;"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="/static/media-handler.js"></script>
+    <script src="/static/gemini-client.js"></script>
+    <script src="/static/main.js"></script>
+  </body>
+</html>
