@@ -95,7 +95,12 @@ async def websocket_endpoint(websocket: WebSocket):
         except WebSocketDisconnect:
             logger.info("WebSocket disconnected")
         except Exception as e:
-            logger.error(f"Error receiving from client: {e}")
+            # "Cannot call receive once a disconnect message has been received"
+            # is expected when user clicks End & Analyze (frontend closes WS first)
+            if "disconnect" in str(e).lower():
+                logger.info("WebSocket already disconnected (expected)")
+            else:
+                logger.error(f"Error receiving from client: {e}")
 
     receive_task = asyncio.create_task(receive_from_client())
 

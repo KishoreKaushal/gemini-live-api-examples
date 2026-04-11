@@ -16,6 +16,7 @@ const analysisResult = document.getElementById("analysis-result");
 // Accumulate all transcript fragments for the Brain phase
 let fullTranscript = [];
 let currentTranscriptDiv = null;
+let isAnalyzing = false;
 
 const mediaHandler = new MediaHandler();
 const geminiClient = new GeminiClient({
@@ -41,7 +42,10 @@ const geminiClient = new GeminiClient({
     console.log("WS Closed:", e);
     statusDiv.textContent = "Disconnected";
     statusDiv.className = "status disconnected";
-    showSessionEnd();
+    // Don't navigate away if we're analyzing — stay on the same page
+    if (!isAnalyzing) {
+      showSessionEnd();
+    }
   },
   onError: (e) => {
     console.error("WS Error:", e);
@@ -130,13 +134,17 @@ analyzeBtn.onclick = async () => {
     return;
   }
 
+  // Flag so onClose doesn't navigate away
+  isAnalyzing = true;
+
   // Stop recording and disconnect
   mediaHandler.stopAudio();
   micBtn.textContent = "Start Mic";
   micBtn.classList.remove("recording");
   geminiClient.disconnect();
 
-  // Show loading state
+  // Hide controls, show loading state
+  document.querySelector(".controls").classList.add("hidden");
   analysisPanel.classList.remove("hidden");
   analysisResult.textContent = "Analyzing transcript...";
   analyzeBtn.disabled = true;
@@ -151,13 +159,29 @@ analyzeBtn.onclick = async () => {
     const result = await response.json();
 
     if (result.status === "ok") {
-      analysisResult.textContent = JSON.stringify(result.data, null, 2);
+      const formatted = JSON.stringify(result.data, null, 2);
+      analysisResult.textContent = formatted;
+      console.log("=== Clinical Analysis Result ===");
+      console.log(result.data);
     } else {
       analysisResult.textContent = "Error: " + result.error;
+      console.error("Analysis error:", result.error);
     }
   } catch (e) {
     analysisResult.textContent = "Network error: " + e.message;
+    console.error("Network error:", e);
   }
+
+  // Show "Start New Session" button inline
+  const newSessionBtn = document.createElement("button");
+  newSessionBtn.textContent = "Start New Session";
+  newSessionBtn.className = "btn";
+  newSessionBtn.style.marginTop = "15px";
+  newSessionBtn.onclick = () => {
+    isAnalyzing = false;
+    resetUI();
+  };
+  analysisPanel.appendChild(newSessionBtn);
 };
 
 // Reset / Restart
@@ -166,6 +190,11 @@ function resetUI() {
   appSection.classList.add("hidden");
   sessionEndSection.classList.add("hidden");
   analysisPanel.classList.add("hidden");
+  document.querySelector(".controls").classList.remove("hidden");
+
+  // Remove any dynamically added "Start New Session" buttons
+  const dynamicBtns = analysisPanel.querySelectorAll("button");
+  dynamicBtns.forEach(btn => btn.remove());
 
   mediaHandler.stopAudio();
   micBtn.textContent = "Start Mic";
@@ -175,6 +204,7 @@ function resetUI() {
   analyzeBtn.disabled = false;
   fullTranscript = [];
   currentTranscriptDiv = null;
+  isAnalyzing = false;
 }
 
 function showSessionEnd() {
